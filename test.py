@@ -24,12 +24,13 @@ model = LlamaForCausalLM.from_pretrained(model_path, device_map='auto', torch_dt
 device = torch.device('cuda')
 
 # 加载示例Context
-contexts = json.load(open('en_contexts.json'))
+contexts = json.load(open('contexts.json'))
 
 # 示例问题集（一次性问多个问题，NBCE自行根据Context逐一输出答案）
 question = """请仔细阅读材料，逐一回答：
 - 吉利德收购Pharmasset的价格是多少？
 - 2022年余村人均纯收入是多少？
+- 如果你是默沙东的CEO，你的首要任务是什么？
 - 中亚峰会将在哪里举行？由谁主持？
 - 哪个项目宣称“能过坦克”的水上道路？
 """
@@ -39,7 +40,7 @@ question_en = """Please read the material carefully and answer the following que
 - Why is Harvard being investigated?
 - What did Vlad spot?
 """
-question = question_en
+# question = question_en
 
 # 拼接context和question
 contexts = [''] + contexts  # 添加空Context（无Context预测）
@@ -57,6 +58,7 @@ def generate(max_tokens):
     """Naive Bayes-based Context Extension 演示代码
     """
     inputs = tokenizer(batch, padding='longest', return_tensors='pt').to(device)
+    print(inputs,file=open('input_tokens.txt','a'))
     input_ids = inputs.input_ids
     attention_mask = inputs.attention_mask
     
@@ -98,8 +100,11 @@ def generate(max_tokens):
         if next_tokens[0] == tokenizer.eos_token_id:
             break
             
+        print(next_tokens,file=open('log_tokens.txt','a'))
         ret = tokenizer.batch_decode(next_tokens)
-        print(ret[0], flush=True, end='')
+        print(ret,file=open('log.txt','a'))
+        print(ret[0], flush=True, end='',file=open('output.txt','a'))
+        
         
         # prepare for next iteration
         input_ids = next_tokens.unsqueeze(-1).tile(n, 1)
