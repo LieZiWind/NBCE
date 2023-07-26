@@ -20,7 +20,7 @@ tokenizer.padding_side = 'left'
 tokenizer.pad_token = tokenizer.unk_token
 
 # 加载LLAMA模型
-model = LlamaForCausalLM.from_pretrained(model_path, device_map='auto', torch_dtype=torch.bfloat16)
+model = LlamaForCausalLM.from_pretrained(model_path, device_map='auto', torch_dtype=torch.float16)
 device = torch.device('cuda')
 
 # 加载示例Context
