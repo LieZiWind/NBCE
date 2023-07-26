@@ -12,7 +12,7 @@ from transformers import TopPLogitsWarper, LogitsProcessorList
 
 # 经过微调的LLAMA
 # 下载地址：https://openbuddy.ai/
-model_path = '/root/autodl-tmp/7b-trans-chat-0516-bf16'
+model_path = '/home/dqwang/scratch/yuankaili/model/vicuna-7b-v1.3'
 
 # 加载tokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_path)
@@ -28,14 +28,9 @@ contexts = json.load(open('contexts.json'))
 
 # 示例问题集（一次性问多个问题，NBCE自行根据Context逐一输出答案）
 question = """请仔细阅读材料，逐一回答：
-- 菲律宾国家电网公司，中国占股多少？
-- 领英计划裁员多少人？
 - 吉利德收购Pharmasset的价格是多少？
-- 丙肝神药Sovaldi在哪一年上市？
-- 中亚峰会将在哪里举行？由谁主持？
-- 哪个演员由于侮辱人民军队而被立案调查？
-- 哪个项目宣称“能过坦克”的水上道路？
-- 如果你是默沙东的CEO，你的首要任务是什么？"""
+- 2022年余村人均纯收入是多少？
+"""
 
 # 拼接context和question
 contexts = [''] + contexts  # 添加空Context（无Context预测）
