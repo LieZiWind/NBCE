@@ -30,7 +30,15 @@ contexts = json.load(open('contexts.json'))
 question = """请仔细阅读材料，逐一回答：
 - 吉利德收购Pharmasset的价格是多少？
 - 2022年余村人均纯收入是多少？
+- 中亚峰会将在哪里举行？由谁主持？
+- 哪个项目宣称“能过坦克”的水上道路？
 """
+
+question_en = """Please read the material carefully and answer the following question one by one：
+- How many surgeries has Boriskin had?
+- What did Vlad spot?
+"""
+#question = question_en
 
 # 拼接context和question
 contexts = [''] + contexts  # 添加空Context（无Context预测）
