@@ -24,7 +24,7 @@ model = LlamaForCausalLM.from_pretrained(model_path, device_map='auto', torch_dt
 device = torch.device('cuda')
 
 # 加载示例Context
-contexts = json.load(open('contexts.json'))
+contexts = json.load(open('en_contexts.json'))
 
 # 示例问题集（一次性问多个问题，NBCE自行根据Context逐一输出答案）
 question = """请仔细阅读材料，逐一回答：
@@ -36,9 +36,10 @@ question = """请仔细阅读材料，逐一回答：
 
 question_en = """Please read the material carefully and answer the following question one by one：
 - How many surgeries has Boriskin had?
+- Why is Harvard being investigated?
 - What did Vlad spot?
 """
-#question = question_en
+question = question_en
 
 # 拼接context和question
 contexts = [''] + contexts  # 添加空Context（无Context预测）
