@@ -24,7 +24,7 @@ model = LlamaForCausalLM.from_pretrained(model_path, device_map='auto', torch_dt
 device = torch.device('cuda')
 
 # 加载示例Context
-contexts = json.load(open('contexts.json'))
+contexts = json.load(open('en_contexts.json'))
 
 # 示例问题集（一次性问多个问题，NBCE自行根据Context逐一输出答案）
 question = """请仔细阅读材料，逐一回答：
@@ -40,7 +40,7 @@ question_en = """Please read the material carefully and answer the following que
 - Why is Harvard being investigated?
 - What did Vlad spot?
 """
-# question = question_en
+question = question_en
 
 # 拼接context和question
 contexts = [''] + contexts  # 添加空Context（无Context预测）
@@ -53,10 +53,14 @@ processors = LogitsProcessorList()
 processors.append(TopPLogitsWarper(0.95))
 
 
+
+
 @torch.inference_mode()
 def generate(max_tokens):
     """Naive Bayes-based Context Extension 演示代码
     """
+  
+    ans_tokens = []
     inputs = tokenizer(batch, padding='longest', return_tensors='pt').to(device)
     print(inputs,file=open('input_tokens.txt','a'))
     input_ids = inputs.input_ids
@@ -94,23 +98,29 @@ def generate(max_tokens):
         # 构建分布，采样
         # tau = 1是标准的随机采样，tau->0则是贪心搜索
         # 简单起见，这里没有实现topk、topp截断
-        tau = 0.01
+        tau = 1
         probas = torch.nn.functional.softmax(logits[None] / tau , dim=-1)
         next_tokens = torch.multinomial(probas, num_samples=1).squeeze(1)        
         if next_tokens[0] == tokenizer.eos_token_id:
             break
             
-        print(next_tokens,file=open('log_tokens.txt','a'))
-        ret = tokenizer.batch_decode(next_tokens)
-        print(ret,file=open('log.txt','a'))
-        print(ret[0], flush=True, end='',file=open('output.txt','a'))
+        #print(next_tokens,file=open('log_tokens.txt','a'))
+        #ret = tokenizer.batch_decode(next_tokens)
+        #print(ret,file=open('log.txt','a'))
+
+        ans_tokens.append(next_tokens[0])
+        
+        #print(ans,file=open('log_ans.txt','a'))
+        #print(ret[0], flush=True, end='',file=open('output.txt','a'))
         
         
         # prepare for next iteration
         input_ids = next_tokens.unsqueeze(-1).tile(n, 1)
         attention_mask = torch.cat([attention_mask, torch.ones(n, 1, dtype=torch.long, device=device)], dim=-1)        
 
-
+    text = tokenizer.decode(ans_tokens)
+    print(text,file=open('output.txt','a'))
+    print(text)
 if __name__ == '__main__':
     generate(1000)
 
